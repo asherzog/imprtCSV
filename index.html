@@ -5,7 +5,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <title>File Uploader - coligo.io</title>
+  <title>File Uploader</title>
   <link href='https://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
   <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/css/bootstrap.min.css">
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-table/1.11.1/bootstrap-table.min.css" />
@@ -13,38 +13,23 @@
   <script src="https://d3js.org/d3.v3.min.js" charset="utf-8"></script>
   <script src="./papaparse.min.js" charset="utf-8"></script>
   <script src="https://code.jquery.com/jquery-2.2.0.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.js"></script>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/jqueryui/1.11.4/jquery-ui.css" rel="stylesheet">
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.9.1/xlsx.core.min.js"></script>
 
 </head>
 <body>
   <h1>practice</h1>
 
-  <input type="file" accept=".csv" id="fileLoad">
-
-  <table id="split" class="table">
-    <thead></thead>
-    <tbody></tbody>
-  </table>
-
-  <script>
-  var data;
-
-  function handleFileSelect(evt) {
-    var file = evt.target.files[0];
-
-    Papa.parse(file, {
-      header: true,
-      dynamicTyping: true,
-      complete: function(results) {
-        data = results;
-        console.log(results);
-      }
-    });
-  }
-
-  $(document).ready(function(){
-    $("#fileLoad").change(handleFileSelect);
-  });
-</script>
+  <input type="file" id="fileLoad">
+  <br>
+  <br>
+  <section class="container table-responsive">
+    <table id="split" class="table table-bordered table-hover">
+      <thead></thead>
+      <tbody></tbody>
+    </table>
+  </section>
 
 
   <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.6/js/bootstrap.min.js"></script>
