@@ -63,22 +63,21 @@ d3.select("#fileLoad")
 
          /* Call XLSX */
          var workbook = XLSX.read(bstr, {type:"binary"});
-
-         console.log(workbook);
          var first_sheet_name = workbook.SheetNames[0];
-
         /* Get worksheet */
         var worksheet = workbook.Sheets[first_sheet_name];
 
         let parsed = XLSX.utils.sheet_to_json(worksheet, {header: 'A', raw: true});
         parsed.shift();
-        let things = ['A', 'B', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'P', 'Q', 'R', 'S',
-                      'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ',
+        let things = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'O', 'P', 'Q', 'R', 'S',
+                      'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ',
                       'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT'];
         let count = 0;
         let columns = {}
         while (count < things.length) {
-          columns[count] = parsed[0][things[count]];
+          if (parsed[0][things[count]]) {
+            columns[count] = parsed[0][things[count]];
+          }
           count++;
         };
         parsed.shift();
@@ -87,28 +86,46 @@ d3.select("#fileLoad")
           let count = 0;
           let newRow = {};
           while (count < things.length) {
-            newRow[keys[count]] = row[things[count]];
+            if (row[things[count]]) {
+              newRow[keys[count]] = row[things[count]];
+            } else {
+              newRow[keys[count]] = null;
+            }
             count++;
           }
           return newRow;
         });
 
         function getJsDateFromExcel(excelDate) {
-        	return new Date((excelDate - (25567 + 1))*86400*1000);
+        	let date = new Date((excelDate - (25567 + 1))*86400*1000);
+          return (date.getMonth()+1) + "/" + date.getDate() + "/" + date.getFullYear()
         }
         rows.forEach(row => {
           if (row.COMPLETION) {
             row.COMPLETION = getJsDateFromExcel(+row.COMPLETION);
           }
           if (row.SPUD) {
-            row.SPUD = getJsDateFromExcel(+row.SPUD);
+            if (typeof row.SPUD == 'number' ) {
+              row.SPUD = getJsDateFromExcel(+row.SPUD);
+            } else {
+              row.SPUD = row.SPUD;
+            }
           }
         });
+
+        let jRows = JSON.stringify(rows);
+        console.log(jRows);
+
+
 
 
         var thead = d3.select("thead").selectAll("th")
         .data(d3.keys(rows[0]))
-        .enter().append("th").text(function(d){return d;});
+        .enter().append("th").text(function(d){
+          if (d != 'undefined') {
+            return d;
+          }
+        });
         // fill the table
         // create rows
         var tr = d3.select("tbody").selectAll("tr")
@@ -119,13 +136,8 @@ d3.select("#fileLoad")
         .enter().append("td")
         .text(function(d) {return d;});
 
-        $('tbody').sortable();
-
-
-
-
+         $('tbody').sortable();
       };
-
        oReq.send();
      };
      reader.readAsDataURL(file);
