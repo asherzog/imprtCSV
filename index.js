@@ -72,14 +72,14 @@ d3.select("#fileLoad")
 
          let parsed = XLSX.utils.sheet_to_json(worksheet, {header: 'A', raw: true});
          parsed.shift();
-         let things = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'O', 'P', 'Q', 'R', 'S',
+         let things = ['A', 'B', 'C', 'D', 'E', 'F', 'G', 'H', 'I', 'J', 'K', 'L', 'M', 'N', 'O', 'P', 'Q', 'R', 'S',
                       'T', 'U', 'V', 'W', 'X', 'Y', 'Z', 'AA', 'AB', 'AC', 'AD', 'AE', 'AF', 'AG', 'AH', 'AI', 'AJ',
-                      'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT'];
+                      'AK', 'AL', 'AM', 'AN', 'AO', 'AP', 'AQ', 'AR', 'AS', 'AT', 'AU', 'AV'];
          let count = 0;
          let columns = {};
          while (count < things.length) {
            if (parsed[0][things[count]]) {
-             columns[count] = parsed[0][things[count]];
+             columns[count] = parsed[0][things[count]].replace('.', '');
            }
            count++;
          };
@@ -116,6 +116,13 @@ d3.select("#fileLoad")
                row.SPUD = row.SPUD;
              }
            }
+           if (row.OUTDATE) {
+             if (typeof row.OUTDATE == 'number' ) {
+               row.OUTDATE = getJsDateFromExcel(+row.OUTDATE);
+             } else {
+               row.OUTDATE = row.OUTDATE;
+             }
+           }
          });
          var rigs = alasql('SELECT RIG, ARRAY(_) AS Wells FROM ? GROUP BY RIG',[rows]);
 
@@ -135,8 +142,9 @@ d3.select("#fileLoad")
            }
          }
          rigs = alasql('SELECT RIG, ARRAY(_) AS Wells FROM ? GROUP BY RIG',[filtered]);
-         console.log(rigs);
-
+        // Tc = alasql('SELECT ARRAY(_) AS TC1 FROM ? GROUP BY RIG',[filtered]);
+        //  console.log(Tc[0]);
+        console.log(filtered);
          var thead = d3.select("thead").selectAll("tr")
          .data(d3.keys(rigs[0].Wells[0]))
           .enter().append("th").text(function(d){
@@ -180,7 +188,28 @@ d3.select("#fileLoad")
              });
            });
            tbl.unshift(columns);
-          alasql("SELECT * INTO XLSX('test.xlsx',{headers:true}) FROM ? ",[tbl]);
+           console.log(filtered);
+           filtered = JSON.stringify(filtered);
+           $.post('http://localhost:3000/', filtered, (res) => {
+              console.log(res);
+           });
+          //  rigs.forEach(rig => {
+          //    rig = JSON.stringify(rig);
+          //    $.post('http://localhost:3000/', rig, (res) => {
+          //      console.log(res);
+          //  });
+          // });
+          // let i = 0;
+          //  while(i < filtered.length){
+            //  $.post('http://localhost:3000/', JSON.stringify(filtered.slice(i, i + 400)), (res) => {
+            //     console.log(res);
+            //  });
+          //    i += 400;
+          //  }
+
+
+          // alasql("SELECT * INTO XLSX('test.xlsx',{headers:true}) FROM ? ",[tbl]);
+
          });
 
        };
